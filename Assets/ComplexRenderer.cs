@@ -7,13 +7,12 @@ public class ComplexRenderer : MonoBehaviour {
     private Complex[] values;
     private Vector3[] positions;
 
-    //TODO Make actual material or something
-    private Material lineMat;
+    //TODO Improve material efficiency?
+    public Material lineMat;
 
     // Use this for initialization
     void Start () {
         count = -1;
-        lineMat = new Material("Shader \"Lines/Colored Blended\" {" + "SubShader { Pass { " + "    Blend SrcAlpha OneMinusSrcAlpha " + "    ZWrite Off Cull Off Fog { Mode Off } " + "    BindChannels {" + "      Bind \"vertex\", vertex Bind \"color\", color }" + "} } }");
         //TODO Use shader?
     }
 
@@ -43,15 +42,18 @@ public class ComplexRenderer : MonoBehaviour {
 	}
 
     public void DoRender() {
+        
         GL.PushMatrix();
         GL.Begin(GL.LINES);
         GL.MultMatrix(transform.localToWorldMatrix);
 
         lineMat.SetPass(0);
-        GL.Color(new Color(0f, 0f, 0f, 1f));
+        GL.Color(new Color(0f, 1f, 0f, 1f));
         
         for (int i = 0; i < positions.Length; i++) {
             Vector3 pos = positions[i];
+            lineMat.SetPass(0);
+            GL.Color(new Color(0f, 1f, 0f, 1f));
             GL.Vertex3(pos.x, pos.y, pos.z);
             if (i < positions.Length - 1) {
                 pos = positions[i+1];
@@ -61,5 +63,24 @@ public class ComplexRenderer : MonoBehaviour {
 
         GL.End();
         GL.PopMatrix();
+
+        /*
+        Vector3 last = new Vector3(0, 0, 0);
+        bool already = false;
+        foreach (Vector3 pos in positions) {
+            if (!already) {
+                last = pos;
+                already = true;
+            } else {
+                GL.Begin(GL.LINES);
+                lineMat.SetPass(0);
+                //GL.Color(new Color(0f, 1f, 0f, 1f));
+                GL.Vertex3(last.x, last.y, last.z);
+                GL.Vertex3(pos.x, pos.y, pos.z);
+                GL.End();
+                last = pos;
+            }
+        }
+        */
     }
 }
